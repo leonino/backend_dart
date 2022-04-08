@@ -1,0 +1,4 @@
+class Pedido {
+	final PontoVenda pontoVenda;
+	final Usuario usuarioLogado;
+}
