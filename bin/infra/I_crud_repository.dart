@@ -1,9 +1,9 @@
-import '../utils/utils.dart';
+import '../utils/custom_typedef.dart';
 import 'db_my_sql.dart';
-import 'i_model.dart';
 import 'i_mysql_datasource.dart';
+import 'meta_data.dart';
 
-abstract class ICrudRepository<T extends IModel> {
+abstract class ICrudRepository<T> {
   static final pool = DbMySQL.db;
   final IDataSource ds;
 
@@ -11,27 +11,30 @@ abstract class ICrudRepository<T extends IModel> {
 
   IDataSource get datasource => ds;
 
-  Future<ResponseCrud<T>> findById(String id);
-  Future<ResponseCrud<List<T>>> findAll([String? filtro]);
-  Future<ResponseCrud<T>> save(MapStringOr map);
-  Future<ResponseCrud<void>> deleteId(String id);
+  Future<ResponseSQL<T>> findById(String id);
+  Future<ResponseSQL<List<T>>> findAll({
+    String? filtro,
+    MapString? paginator,
+  });
+  Future<ResponseSQL<T>> save(MapStringOr map);
+  Future<ResponseSQL<void>> deleteId(String id);
 }
 
-class ResponseCrud<T> {
-  final int rowsAfecteds;
-  final int limit;
-  final int offset;
+class ResponseSQL<T> {
+  final Meta? pagination;
   final T data;
+  final int? rowsAfecteds;
+  final String? sql;
 
-  ResponseCrud(
+  ResponseSQL(
     this.data, {
-    required this.rowsAfecteds,
-    this.limit = 0,
-    this.offset = 1,
+    this.sql,
+    this.rowsAfecteds,
+    this.pagination,
   });
 
   T get getData => data;
-  int get getlimit => limit;
-  int get getOffset => offset;
-  int get getRowsAfecteds => rowsAfecteds;
+  int get getRowsAfecteds => rowsAfecteds ?? 0;
+  Meta get getPagination => pagination ?? Meta();
+  String get getSql => sql ?? "";
 }

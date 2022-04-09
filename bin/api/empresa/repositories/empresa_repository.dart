@@ -2,45 +2,64 @@ import '../../../infra/i_crud_repository.dart';
 import '../../../infra/db_my_sql.dart';
 import '../../../infra/i_mysql_datasource.dart';
 
-import '../../../utils/utils.dart';
+import '../../../utils/custom_typedef.dart';
 import '../../models/empresa_model.dart';
 
 class EmpresaRepository extends ICrudRepository<EmpresaModel> {
   EmpresaRepository(IDataSource ds) : super(ds);
 
   @override
-  Future<ResponseCrud<EmpresaModel>> findById(String id) async {
+  Future<ResponseSQL<EmpresaModel>> findById(String id) async {
     var sql =
         "SELECT * FROM ${EmpresaModel.nomeTabela} WHERE ${EmpresaModel.keyId} = '$id'";
     print(sql);
-    var rows = await ds.query(sql);
-    var data = rows.map((row) => EmpresaModel.fromMap(row)).first;
-    return ResponseCrud(data, rowsAfecteds: rows.length);
+    var responseSQL = await ds.query(sql: sql);
+    var data = responseSQL.data.map((row) => EmpresaModel.fromMap(row)).first;
+    return ResponseSQL(
+      data,
+      rowsAfecteds: responseSQL.getData.length,
+      pagination: responseSQL.pagination,
+      sql: responseSQL.sql,
+    );
   }
 
   @override
-  Future<ResponseCrud<List<EmpresaModel>>> findAll([String? filtro]) async {
+  Future<ResponseSQL<List<EmpresaModel>>> findAll({
+    String? filtro,
+    MapString? paginator,
+  }) async {
     var sql = "SELECT * FROM ${EmpresaModel.nomeTabela}";
-    var rows = await ds.query(sql);
-    var data = rows.map((item) => EmpresaModel.fromMap(item)).toList();
-    return ResponseCrud(data, rowsAfecteds: data.length);
+    var resposeSQL = await ds.query(sql: sql);
+    var data =
+        resposeSQL.data.map((item) => EmpresaModel.fromMap(item)).toList();
+    return ResponseSQL(
+      data,
+      rowsAfecteds: data.length,
+      pagination: resposeSQL.pagination,
+      sql: resposeSQL.sql,
+    );
   }
 
   @override
-  Future<ResponseCrud<void>> deleteId(String id) async {
+  Future<ResponseSQL<void>> deleteId(String id) async {
     var sql =
         "DELETE FROM ${EmpresaModel.nomeTabela} WHERE ${EmpresaModel.keyId} = '$id'";
     print(sql);
-    var rows = await ds.query(sql);
-    return ResponseCrud(null, rowsAfecteds: rows.length);
+    var responseSQL = await ds.query(sql: sql);
+    return responseSQL;
   }
 
   @override
-  Future<ResponseCrud<EmpresaModel>> save(MapStringOr map) async {
+  Future<ResponseSQL<EmpresaModel>> save(MapStringOr map) async {
     String sql = DbMySQL.saveSQL(map, EmpresaModel.nomeTabela);
-    var rows = await ds.query(sql);
-    var data = rows.map((row) => EmpresaModel.fromMap(row)).first;
-    return ResponseCrud(data, rowsAfecteds: rows.length);
+    var responseSQL = await ds.query(sql: sql);
+    var data = responseSQL.data.map((row) => EmpresaModel.fromMap(row)).first;
+    return ResponseSQL(
+      data,
+      rowsAfecteds: responseSQL.getData.length,
+      pagination: responseSQL.pagination,
+      sql: responseSQL.sql,
+    );
   }
 }
 

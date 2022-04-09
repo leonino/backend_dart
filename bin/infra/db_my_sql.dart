@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mysql_client/mysql_client.dart';
 
-import '../utils/utils.dart';
+import '../utils/custom_typedef.dart';
 
 class DbMySQL {
   static final db = MySQLConnectionPool(

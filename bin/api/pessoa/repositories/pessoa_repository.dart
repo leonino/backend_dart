@@ -1,49 +1,69 @@
 import '../../../infra/i_crud_repository.dart';
 import '../../../infra/db_my_sql.dart';
 import '../../../infra/i_mysql_datasource.dart';
-import '../../../utils/utils.dart';
+import '../../../utils/custom_typedef.dart';
 import '../../models/pessoa_model.dart';
 
 class PessoaRepository extends ICrudRepository<PessoaModel> {
-  final pool = DbMySQL.db;
-
   PessoaRepository(IDataSource ds) : super(ds);
 
   @override
-  Future<ResponseCrud<List<PessoaModel>>> findAll([String? filtro]) async {
+  Future<ResponseSQL<List<PessoaModel>>> findAll({
+    String? filtro,
+    MapString? paginator,
+  }) async {
     var sql = "SELECT * FROM ${PessoaModel.nomeTabela}";
     print(sql);
-    var result = await pool.execute(sql);
-    var lista = result.rows.map((e) => e.assoc());
-    var data = lista.map((item) => PessoaModel.fromMap(item)).toList();
-    return ResponseCrud(data, rowsAfecteds: data.length);
+    var responseSQL = await ds.query(sql: sql, paginator: paginator);
+    var data = responseSQL.data.map((row) => PessoaModel.fromMap(row)).toList();
+    return ResponseSQL(
+      data,
+      rowsAfecteds: data.length,
+      pagination: responseSQL.pagination,
+      sql: responseSQL.sql,
+    );
   }
 
   @override
-  Future<ResponseCrud<PessoaModel>> findById(String id) async {
+  Future<ResponseSQL<PessoaModel>> findById(String id) async {
     var sql =
         "SELECT * FROM ${PessoaModel.nomeTabela} WHERE ${PessoaModel.keyId} = '$id'";
     print(sql);
-    var result = await pool.execute(sql);
-    var rows = result.rows.first.assoc();
-    var data = PessoaModel.fromMap(rows);
-    return ResponseCrud(data, rowsAfecteds: rows.length);
+    var responseSQL = await ds.query(sql: sql);
+    var data = responseSQL.getData.map((row) => PessoaModel.fromMap(row)).first;
+    return ResponseSQL(
+      data,
+      rowsAfecteds: responseSQL.data.length,
+      pagination: responseSQL.pagination,
+      sql: responseSQL.sql,
+    );
   }
 
   @override
-  Future<ResponseCrud<void>> deleteId(String id) async {
+  Future<ResponseSQL<void>> deleteId(String id) async {
     var sql =
         "DELETE FROM ${PessoaModel.nomeTabela} WHERE ${PessoaModel.keyId} = '$id'";
     print(sql);
-    var rows = await ds.query(sql);
-    return ResponseCrud(null, rowsAfecteds: rows.length);
+    var responseSQL = await ds.query(sql: sql);
+    var rows = responseSQL.getData;
+    return ResponseSQL(
+      null,
+      rowsAfecteds: rows.length,
+      pagination: responseSQL.pagination,
+      sql: responseSQL.sql,
+    );
   }
 
   @override
-  Future<ResponseCrud<PessoaModel>> save(MapStringOr map) async {
+  Future<ResponseSQL<PessoaModel>> save(MapStringOr map) async {
     String sql = DbMySQL.saveSQL(map, PessoaModel.nomeTabela);
-    var rows = await ds.query(sql);
-    var data = rows.map((row) => PessoaModel.fromMap(row)).first;
-    return ResponseCrud(data, rowsAfecteds: rows.length);
+    var responseSQL = await ds.query(sql: sql);
+    var data = responseSQL.getData.map((row) => PessoaModel.fromMap(row)).first;
+    return ResponseSQL(
+      data,
+      rowsAfecteds: responseSQL.getRowsAfecteds,
+      pagination: responseSQL.pagination,
+      sql: responseSQL.sql,
+    );
   }
 }

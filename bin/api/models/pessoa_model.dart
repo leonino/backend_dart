@@ -59,8 +59,8 @@ class PessoaModel implements IModel {
     return {
       "ID": id,
       "CPFCNPJ": cpfcnpj,
-      "DATAEXPEDICAORG": dataexpedicaorg,
-      "DATANASCIMENTO": datanascimento,
+      "DATAEXPEDICAORG": dataexpedicaorg?.toIso8601String() ?? "null",
+      "DATANASCIMENTO": datanascimento?.toIso8601String() ?? "null",
       "DESCRICAOEMAIL": descricaoemail,
       "EMAIL": email,
       "ESTADOCIVIL": estadocivil,
