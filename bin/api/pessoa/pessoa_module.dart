@@ -3,15 +3,19 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import '../../infra/i_mysql_datasource.dart';
 import '../models/pessoa_model.dart';
 import 'repositories/pessoa_repository.dart';
 
 class PessoaModule {
+  final IDataSource dataSource;
+
+  PessoaModule(this.dataSource);
   Handler get handler {
     var router = Router();
 
     router.get('/pessoas', (Request req) async {
-      var repository = PessoaRepository();
+      var repository = PessoaRepository(dataSource);
       var resp = await repository.findAll();
       var pessoas = resp.data;
       return Response.ok(
@@ -20,7 +24,7 @@ class PessoaModule {
 
     router.get('/pessoas/<id>', (Request req) async {
       String? id = req.params['id'];
-      var repository = PessoaRepository();
+      var repository = PessoaRepository(dataSource);
       var resp = await repository.findById(id.toString());
       var pessoa = resp.data;
       return Response.ok("Pessoa => ${pessoa.id}, nome: ${pessoa.nmpessoa}");

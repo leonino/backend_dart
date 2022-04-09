@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import 'api/auth/auth_module.dart';
 import 'api/auth/auth_store.dart';
 
 class SeverHandler {

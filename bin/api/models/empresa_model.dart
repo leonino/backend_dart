@@ -6,27 +6,27 @@ class EmpresaModel extends IModel {
   static String get nomeTabela => "padrao_empresa";
 
   final int? id;
-  final String nome;
+  final String cargoResponsavel;
   final int pessoaId;
 
   EmpresaModel({
     required this.id,
-    required this.nome,
+    required this.cargoResponsavel,
     required this.pessoaId,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'proprietario': nome,
-      'pessoa_id': pessoaId,
+      'ID': id,
+      'CARGORESPONSAVEL': cargoResponsavel,
+      'PESSOA_ID': pessoaId,
     };
   }
 
   factory EmpresaModel.fromMap(Map<String, dynamic> map) {
     return EmpresaModel(
       id: int.parse(map['ID']),
-      nome: map['CARGORESPONSAVEL'] ?? '',
+      cargoResponsavel: map['CARGORESPONSAVEL'] ?? '',
       pessoaId: int.parse(map['PESSOA_ID']),
     );
   }

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mysql_client/mysql_client.dart';
 
+import '../utils/utils.dart';
+
 class DbMySQL {
   static final db = MySQLConnectionPool(
     host: "localhost",
@@ -18,6 +20,47 @@ class DbMySQL {
   }
 
   executeSQL(String sql) {}
+
+  static String saveSQL(MapStringOr map, String nomeTabela,
+      [String keyId = "id"]) {
+    String _sql = "";
+    String? id = map[keyId];
+    bool _isInsert = (id == null || id.isEmpty);
+    map.remove(keyId);
+
+    if (_isInsert) {
+      final f = compositionList(map.keys.toList());
+      final v = compositionList(map.values.toList(), "'", "','", "'");
+      _sql = "INSERT INTO $nomeTabela ($f) VALUES ($v)";
+    } else {
+      final set = compositionMap(map);
+      _sql = "UPDATE $nomeTabela SET $set WHERE $keyId = '$id'";
+    }
+    return _sql;
+  }
+
+  static String compositionList(List lista,
+      [String inicio = "", String meio = ",", String fim = ""]) {
+    String result = lista.map((e) => e.toString()).reduce((comp, value) {
+      return comp = "$comp$meio$value";
+    });
+    return "$inicio$result$fim";
+  }
+
+  static String compositionMap(MapStringOr map) {
+    String result = "";
+    for (var key in map.keys) {
+      result += (result.isEmpty) ? "" : ", ";
+      switch (map[key].runtimeType) {
+        case String:
+          result += key.toString() + "='" + map[key].toString() + "'";
+          break;
+        default:
+          result += key.toString() + "=" + map[key].toString();
+      }
+    }
+    return result;
+  }
 }
 
 

@@ -3,9 +3,14 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import '../../infra/i_mysql_datasource.dart';
 import 'auth_store.dart';
 
 class AuthModule {
+  final IDataSource dataSource;
+
+  AuthModule(this.dataSource);
+
   Handler get handler {
     var router = Router();
 

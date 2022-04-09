@@ -1,13 +1,20 @@
+import '../utils/utils.dart';
 import 'db_my_sql.dart';
 import 'i_model.dart';
+import 'i_mysql_datasource.dart';
 
 abstract class ICrudRepository<T extends IModel> {
   static final pool = DbMySQL.db;
+  final IDataSource ds;
+
+  ICrudRepository(this.ds);
+
+  IDataSource get datasource => ds;
 
   Future<ResponseCrud<T>> findById(String id);
   Future<ResponseCrud<List<T>>> findAll([String? filtro]);
-  Future<ResponseCrud<T>> updateById(T model);
-  Future<ResponseCrud<T>> deleteId(String id);
+  Future<ResponseCrud<T>> save(MapStringOr map);
+  Future<ResponseCrud<void>> deleteId(String id);
 }
 
 class ResponseCrud<T> {
